@@ -790,6 +790,7 @@ var PACMAN = (function () {
         user         = null,
         stored       = null;
 
+    // Sosete
     function getTick() { 
         return tick;
     };
