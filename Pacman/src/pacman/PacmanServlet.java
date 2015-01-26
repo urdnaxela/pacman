@@ -3,8 +3,13 @@ package pacman;
 import com.google.appengine.api.channel.ChannelService;
 import com.google.appengine.api.channel.ChannelServiceFactory;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+
+import cronjob.GameSynchronizer;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -62,6 +67,9 @@ public class PacmanServlet extends HttpServlet {
       game = pm.getObjectById(Game.class, KeyFactory.stringToKey(gameKey));
       if (game.getUserO() == null && !userId.equals(game.getUserX())) {
         game.setUserO(userId);
+        
+        //add synchronize
+        GameSynchronizer.queueObjectsNeedingProcessing();       
       }
     } else {
       game = new Game(userId, null, "         ", true);

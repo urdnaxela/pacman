@@ -1,67 +1,150 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title>Google App Engine Pacman</title>
-    
+
     <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src='/_ah/channel/jsapi'></script>
     <style type="text/css">
-      @font-face {
-	    font-family: 'BDCartoonShoutRegular';
-        src: url('BD_Cartoon_Shout-webfont.ttf') format('truetype');
-	    font-weight: normal;
-	    font-style: normal;
-      }
-      #pacman {
-        height:450px;
-        width:342px;
-        margin:20px auto;
-      }
-      #shim { 
-        font-family: BDCartoonShoutRegular; 
-        position:absolute;
-        visibility:hidden
-      }
-      h1 { font-family: BDCartoonShoutRegular; text-align:center; }
-      body { width:342px; margin:0px auto; font-family:sans-serif; }
-      a { text-decoration:none; }
+        @font-face {
+            font-family: 'BDCartoonShoutRegular';
+            src: url('BD_Cartoon_Shout-webfont.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        #pacman {
+            height: 450px;
+            width: 342px;
+            margin: 20px auto;
+        }
+        #shim {
+            font-family: BDCartoonShoutRegular;
+            position: absolute;
+            visibility: hidden
+        }
+        h1 {
+            font-family: BDCartoonShoutRegular;
+            text-align: center;
+        }
+        body {
+            width: 342px;
+            margin: 0px auto;
+            font-family: sans-serif;
+        }
+        a {
+            text-decoration: none;
+        }
     </style>
 
 </head>
 
 <body>
-  <div id='display-area'>
-    <div id="shim">shim for font face</div>
+    <script src="pacman.js"></script>
+    <script src="modernizr-1.5.min.js"></script>
+    <script type='text/javascript'>
+        //initi the chanel API for users
+        var state = {
+            game_key: '{{ game_key }}',
+            me: '{{ me }}'
+        };
 
-    <h1>Google App Engine Pacman</h1>    
-    
-    <div id='other-player' style='display:none'>
-      Waiting for another player to join.<br>
-      Send them this link to play:<br>
-      <div id='game-link'><a href='{{ game_link }}'>{{ game_link }}</a></div>
+        updateGame = function() {
+            //init pac-man
+            var el = document.getElementById("pacman");
+
+            if (Modernizr.canvas && Modernizr.localstorage &&
+                Modernizr.audio && (Modernizr.audio.ogg || Modernizr.audio.mp3)) {
+                window.setTimeout(function() {
+                    PACMAN.init(el, "./", state);
+                }, 0);
+            } else {
+                el.innerHTML = "Sorry, needs a decent browser<br /><small>" +
+                    "(firefox 3.6+, Chrome 4+, Opera 10+ and Safari 4+)</small>";
+            }
+        };
+
+        isMyMove = function() {
+            return (state.winner == "") &&
+                (state.moveX == (state.userX == state.me));
+        }
+
+        myPiece = function() {
+            return state.userX == state.me ? 'X' : 'O';
+        }
+
+        sendMessage = function(path, opt_param) {
+            path += '?gamekey=' + state.game_key;
+            if (opt_param) {
+                path += '&' + opt_param;
+            }
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', path, true);
+            xhr.send();
+        };
+
+        moveInSquare = function(id) {
+            if (isMyMove() && state.board[id] == ' ') {
+                sendMessage('/move', 'i=' + id);
+            }
+        }
+
+        onOpened = function() {
+            debugger;
+            sendMessage('/opened');
+        };
+
+        onMessage = function(m) {
+            newState = JSON.parse(m.data);
+            state.board = newState.board || state.board;
+            state.userX = newState.userX || state.userX;
+            state.userO = newState.userO || state.userO;
+            state.moveX = newState.moveX == 'true';
+            state.winner = newState.winner || "";
+            state.winningBoard = newState.winningBoard || "";
+            updateGame();
+        }
+
+        openChannel = function() {
+            debugger;
+            var token = '{{ token }}';
+            var channel = new goog.appengine.Channel(token);
+            var handler = {
+                'onopen': onOpened,
+                'onmessage': onMessage,
+                'onerror': function() {},
+                'onclose': function() {}
+            };
+            var socket = channel.open(handler);
+            socket.onopen = onOpened;
+            socket.onmessage = onMessage;
+        }
+
+        initialize = function() {
+            debugger;
+            openChannel();
+            onMessage({
+                data: '{{ initial_message }}'
+            });
+        }
+
+        setTimeout(initialize, 100);
+    </script>
+    <div id='display-area'>
+        <div id="shim">shim for font face</div>
+        <h1>Google App Engine Pacman</h1>
+        <div id='other-player' style='display:none'>
+            Waiting for another player to join.
+            <br> Send them this link to play:
+            <br>
+            <div id='game-link'><a href='{{ game_link }}'>{{ game_link }}</a>
+            </div>
+        </div>
+        <div id='board'>
+            <div id="pacman"></div>
+        </div>
     </div>
-    
-    <div id='board'>
-      <div id="pacman"></div>
-    </div>
-
-  </div>
-
-  <script src="pacman.js"></script>
-  <script src="modernizr-1.5.min.js"></script>
-
-  <script>
-
-    var el = document.getElementById("pacman");
-
-    if (Modernizr.canvas && Modernizr.localstorage && 
-        Modernizr.audio && (Modernizr.audio.ogg || Modernizr.audio.mp3)) {
-      window.setTimeout(function () { PACMAN.init(el, "./"); }, 0);
-    } else { 
-      el.innerHTML = "Sorry, needs a decent browser<br /><small>" + 
-        "(firefox 3.6+, Chrome 4+, Opera 10+ and Safari 4+)</small>";
-    }
-  </script>
-
 </body>
+
 </html>
