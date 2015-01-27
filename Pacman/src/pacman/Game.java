@@ -27,25 +27,25 @@ import javax.jdo.annotations.PrimaryKey;
 public class Game {
   @PrimaryKey
   @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-  private Key key;
+  private Key key = null;
 
   @Persistent
-  private String userX;
+  private String userX = null;
 
   @Persistent
-  private String userO;
+  private String userO = null;
 
   @Persistent
-  private String board;
+  private String board = null;
 
   @Persistent
-  private Boolean moveX;
+  private Boolean moveX = null;
   
   @Persistent
-  private String winner;
+  private String winner = null;
   
   @Persistent
-  private String winningBoard;
+  private String winningBoard = null;
 
   static final Pattern[] XWins = {
       Pattern.compile("XXX......"),
@@ -112,7 +112,7 @@ public class Game {
     Map<String, String> state = new HashMap<String, String>();
     state.put("userX", userX);
     if (userO == null) {
-      state.put("userO", "");
+      state.put("userO", null);
     } else {
       state.put("userO", userO);
     }

@@ -50,15 +50,11 @@
             me: '{{ me }}'
         };
 
-        updateGame = function() {
+        updateGame = function(currentState) {
             //init pac-man
-            var el = document.getElementById("pacman");
-
             if (Modernizr.canvas && Modernizr.localstorage &&
                 Modernizr.audio && (Modernizr.audio.ogg || Modernizr.audio.mp3)) {
-                window.setTimeout(function() {
-                    PACMAN.init(el, "./", state);
-                }, 0);
+                PACMAN.init("./", currentState);
             } else {
                 el.innerHTML = "Sorry, needs a decent browser<br /><small>" +
                     "(firefox 3.6+, Chrome 4+, Opera 10+ and Safari 4+)</small>";
@@ -91,7 +87,6 @@
         }
 
         onOpened = function() {
-            debugger;
             sendMessage('/opened');
         };
 
@@ -103,11 +98,10 @@
             state.moveX = newState.moveX == 'true';
             state.winner = newState.winner || "";
             state.winningBoard = newState.winningBoard || "";
-            updateGame();
+            updateGame(newState);
         }
 
         openChannel = function() {
-            debugger;
             var token = '{{ token }}';
             var channel = new goog.appengine.Channel(token);
             var handler = {
@@ -122,14 +116,14 @@
         }
 
         initialize = function() {
-            debugger;
             openChannel();
             onMessage({
                 data: '{{ initial_message }}'
             });
         }
 
-        setTimeout(initialize, 100);
+       setTimeout(initialize, 100);
+       
     </script>
     <div id='display-area'>
         <div id="shim">shim for font face</div>
@@ -142,7 +136,7 @@
             </div>
         </div>
         <div id='board'>
-            <div id="pacman"></div>
+            <canvas id ='canvasId' height="426px" width="342px"></canvas>
         </div>
     </div>
 </body>

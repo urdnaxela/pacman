@@ -162,7 +162,6 @@ Pacman.Ghost = function(game, map, colour) {
     };
 
     function draw(ctx) {
-
         var s = map.blockSize,
             top = (position.y / 10) * s,
             left = (position.x / 10) * s;
@@ -646,7 +645,6 @@ Pacman.Map = function(size) {
     };
 
     function drawPills(ctx) {
-        debugger;
 
         if (++pillSize > 30) {
             pillSize = 0;
@@ -753,7 +751,6 @@ Pacman.Audio = function(game) {
     };
 
     function progress(event, name, callback) {
-        debugger;
         if (event.loaded == event.total && typeof callback == "function") {
             callback();
             files[name].removeEventListener("canplaythrough",
@@ -959,7 +956,7 @@ var PACMAN = (function() {
     }
 
     function mainDraw() {
-
+    	
         var diff, u, i, len, nScore;
 
         ghostPos = [];
@@ -1002,52 +999,50 @@ var PACMAN = (function() {
     };
 
     function mainLoop() {
-        debugger;
-
         var diff;
 
         if (state !== PAUSE) {
             ++tick;
         }
-
-        map.drawPills(ctx);
-
-        if (state === PLAYING) {
-            mainDraw();
-        } else if (state === WAITING && stateChanged) {
-            stateChanged = false;
-            map.draw(ctx);
-            dialog("Press N to start a New game");
-        } else if (state === EATEN_PAUSE && (tick - timerStart) > (Pacman.FPS / 3)) {
-            map.draw(ctx);
-            setState(PLAYING);
-        } else if (state === DYING) {
-            if (tick - timerStart > (Pacman.FPS * 2)) {
-                loseLife();
-            } else {
-                redrawBlock(userPos);
-                for (i = 0, len = ghosts.length; i < len; i += 1) {
-                    redrawBlock(ghostPos[i].old);
-                    ghostPos.push(ghosts[i].draw(ctx));
-                }
-                user.drawDead(ctx, (tick - timerStart) / (Pacman.FPS * 2));
-            }
-        } else if (state === COUNTDOWN) {
-
-            diff = 5 + Math.floor((timerStart - tick) / Pacman.FPS);
-
-            if (diff === 0) {
-                map.draw(ctx);
-                setState(PLAYING);
-            } else {
-                if (diff !== lastTime) {
-                    lastTime = diff;
-                    map.draw(ctx);
-                    dialog("Starting in: " + diff);
-                }
-            }
-        }
-
+              	
+	        map.drawPills(ctx);
+	
+	        if (state === PLAYING) {
+	            mainDraw();
+	        } else if (state === WAITING && stateChanged) {
+	            stateChanged = false;
+	            map.draw(ctx);
+	            dialog("Press N to start a New game");
+	        } else if (state === EATEN_PAUSE && (tick - timerStart) > (Pacman.FPS / 3)) {
+	            map.draw(ctx);
+	            setState(PLAYING);
+	        } else if (state === DYING) {
+	            if (tick - timerStart > (Pacman.FPS * 2)) {
+	                loseLife();
+	            } else {
+	                redrawBlock(userPos);
+	                for (i = 0, len = ghosts.length; i < len; i += 1) {
+	                    redrawBlock(ghostPos[i].old);
+	                    ghostPos.push(ghosts[i].draw(ctx));
+	                }
+	                user.drawDead(ctx, (tick - timerStart) / (Pacman.FPS * 2));
+	            }
+	        } else if (state === COUNTDOWN) {
+	
+	            diff = 5 + Math.floor((timerStart - tick) / Pacman.FPS);
+	
+	            if (diff === 0) {
+	                map.draw(ctx);
+	                setState(PLAYING);
+	            } else {
+	                if (diff !== lastTime) {
+	                    lastTime = diff;
+	                    map.draw(ctx);
+	                    dialog("Starting in: " + diff);
+	                }
+	            }
+	        }
+	        
         var display = {
             'other-player': 'none',
             'your-move': 'none',
@@ -1058,7 +1053,7 @@ var PACMAN = (function() {
             'this-game': 'block',
         };
 
-        if (!globalState.userO || globalState.userO == '') {
+        if (!globalState.userO || globalState.userO == null) {
             display['other-player'] = 'block';
             display['board'] = 'none';
             display['this-game'] = 'none';
@@ -1075,6 +1070,7 @@ var PACMAN = (function() {
         $.each(display, function(index, value) {
             $("#" + index).css("display", value);
         });
+        
         drawFooter();
     }
 
@@ -1102,38 +1098,48 @@ var PACMAN = (function() {
         }
     };
 
-    function init(wrapper, root, state) {
-        debugger;
-
+    function init(root, state) {
         globalState = state;
-        var i, len, ghost, blockSize = wrapper.offsetWidth / 19,
-            canvas = document
-            .createElement("canvas");
+        var i, len, ghost,  canvas, blockSize;
+		        
+       	canvas = document.getElementById("canvasId");
+       	//CLEAR our canvas to draw new stuff on it
+		ctx = canvas.getContext('2d');
+		// Store the current transformation matrix
+		ctx.save();
 
-        canvas.setAttribute("width", (blockSize * 19) + "px");
-        canvas.setAttribute("height", (blockSize * 22) + 30 + "px");
+		// Use the identity matrix while clearing the canvas
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        wrapper.appendChild(canvas);
+		// Restore the transform
+		ctx.restore();
 
-        ctx = canvas.getContext('2d');
-
+		//get block size
+		blockSize = canvas.offsetWidth / 19;
+		
         audio = new Pacman.Audio({
             "soundDisabled": soundDisabled
         });
-        map = new Pacman.Map(blockSize);
-        user = new Pacman.User({
-            "completedLevel": completedLevel,
-            "eatenPill": eatenPill
-        }, map);
-
-        for (i = 0, len = ghostSpecs.length; i < len; i += 1) {
-            ghost = new Pacman.Ghost({
-                "getTick": getTick
-            }, map, ghostSpecs[i]);
-            ghosts.push(ghost);
+        
+        if(map == null){
+        	map = new Pacman.Map(blockSize);
+            for (i = 0, len = ghostSpecs.length; i < len; i += 1) {
+                ghost = new Pacman.Ghost({
+                    "getTick": getTick
+                }, map, ghostSpecs[i]);
+                ghosts.push(ghost);
+            }
+        }
+        
+        if(user == null){
+	        user = new Pacman.User({
+	            "completedLevel": completedLevel,
+	            "eatenPill": eatenPill
+	        }, map);
         }
 
-        map.draw(ctx);
+       map.draw(ctx);                
 
         var extension = Modernizr.audio.ogg ? 'ogg' : 'mp3';
 
@@ -1164,13 +1170,9 @@ var PACMAN = (function() {
     };
 
     function loaded() {
-
-        map.reset();
-        dialog("Press N to Start");
-
+    	dialog("Press N to Start");
         document.addEventListener("keydown", keyDown, true);
         document.addEventListener("keypress", keyPress, true);
-
         timer = window.setInterval(mainLoop, 1000 / Pacman.FPS);
     };
 

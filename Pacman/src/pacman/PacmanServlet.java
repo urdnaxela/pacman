@@ -72,7 +72,7 @@ public class PacmanServlet extends HttpServlet {
         GameSynchronizer.queueObjectsNeedingProcessing();       
       }
     } else {
-      game = new Game(userId, null, "         ", true);
+      game = new Game(userId, null, null, true);
       pm.makePersistent(game);
       gameKey = KeyFactory.keyToString(game.getKey());
     }
