@@ -870,6 +870,8 @@ var PACMAN = (function() {
     }
 
     function startNewGame() {
+    	debugger;
+        callServlet("START");
         setState(WAITING);
         level = 1;
         user.reset();
@@ -879,8 +881,6 @@ var PACMAN = (function() {
     }
 
     function keyDown(e) {
-
-    	sendMessage("test");
         if (e.keyCode === KEY.N) {
             startNewGame();
         } else if (e.keyCode === KEY.O) {
@@ -1097,7 +1097,6 @@ var PACMAN = (function() {
         if (state !== WAITING && state !== PAUSE) {
             e.preventDefault();
             e.stopPropagation();
-            sendMessage("test");
         }
     };
 
@@ -1662,20 +1661,8 @@ Object.prototype.clone = function() {
     return newObj;
 };
 
-function sendMessage(path, opt_param) {
-    path += '?gamekey=' + state.game_key;
-    if (opt_param) {
-        path += '&' + opt_param;
-    }
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', path, true);
-    xhr.send();
-};
-
-function sendMessage(id) {
-    if (isMyMove() && state.board[id] == ' ') {
-        sendMessage('/move', 'i=' + id);
-    }
+function callServlet(id) {
+    sendMessage('/move', 'i=' + id);
 }
 
 //isMyMove = function() {

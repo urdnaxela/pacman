@@ -16,7 +16,8 @@ public class MoveServlet extends HttpServlet {
   public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     UserService userService = UserServiceFactory.getUserService();
     String gameId = req.getParameter("gamekey");
-    int piece = new Integer(req.getParameter("i"));
+    String piece = req.getParameter("i"); 
+    
     PersistenceManager pm = PMF.get().getPersistenceManager();
     Game game = pm.getObjectById(Game.class, KeyFactory.stringToKey(gameId));
     

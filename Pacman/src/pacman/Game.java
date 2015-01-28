@@ -45,6 +45,9 @@ public class Game {
   private String winner = null;
   
   @Persistent
+  private String gameState = null;
+  
+  @Persistent
   private String winningBoard = null;
 
   static final Pattern[] XWins = {
@@ -107,6 +110,14 @@ public class Game {
   public void setMoveX(boolean moveX) {
     this.moveX = moveX;
   }
+  
+  public String getGameState() {
+	  return gameState;
+  }
+
+  public void setGameState(String gameState) {
+	  this.gameState = gameState;
+  }
 
   public String getMessageString() {
     Map<String, String> state = new HashMap<String, String>();
@@ -122,6 +133,9 @@ public class Game {
     if (winner != null && winner != "") {
       state.put("winningBoard", winningBoard);
     }
+    
+    state.put("gameState", gameState);
+    
     JSONObject message = new JSONObject(state);
     return message.toString();
   }
@@ -163,7 +177,7 @@ public class Game {
     }
   }
 
-  public boolean makeMove(int position, String user) {
+  public boolean makeMove(String gameState, String user) {
     String currentMovePlayer;
     char value;
     if (getMoveX()) {
@@ -174,15 +188,21 @@ public class Game {
       currentMovePlayer = getUserO();
     }
 
-    if (currentMovePlayer.equals(user)) {
-      char[] boardBytes = getBoard().toCharArray();
-      boardBytes[position] = value;
-      setBoard(new String(boardBytes));
-      checkWin();
-      setMoveX(!getMoveX());
-      sendUpdateToClients();
-      return true;
-    }
+//    if (currentMovePlayer.equals(user)) {
+//      char[] boardBytes = getBoard().toCharArray();
+//      boardBytes[position] = value;
+//      setBoard(new String(boardBytes));
+//      checkWin();
+//      setMoveX(!getMoveX());
+//       
+//      sendUpdateToClients();
+//      return true;
+//    }
+    
+    if ("START".equals(gameState)) {
+    	sendUpdateToClients();
+    	return true;	
+	}
     
     return false;
   }

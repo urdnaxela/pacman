@@ -51,6 +51,12 @@
         };
 
         updateGame = function(currentState) {
+        	debugger;
+            
+            if (currentState.gameState === "START") {
+            	PACMAN.startNewGame();
+            }
+            
             //init pac-man
             if (Modernizr.canvas && Modernizr.localstorage &&
                 Modernizr.audio && (Modernizr.audio.ogg || Modernizr.audio.mp3)) {
@@ -83,6 +89,7 @@
             state.moveX = newState.moveX == 'true';
             state.winner = newState.winner || "";
             state.winningBoard = newState.winningBoard || "";
+            state.gameState = newState.gameState || "";
             updateGame(newState);
         }
 
