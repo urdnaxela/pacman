@@ -364,6 +364,7 @@ Pacman.User = function(game, map) {
     };
 
     function keyDown(e) {
+    	debugger;
         if (typeof keyMap[e.keyCode] !== "undefined") {
             due = keyMap[e.keyCode];
             e.preventDefault();
@@ -879,6 +880,7 @@ var PACMAN = (function() {
 
     function keyDown(e) {
 
+    	sendMessage("test");
         if (e.keyCode === KEY.N) {
             startNewGame();
         } else if (e.keyCode === KEY.O) {
@@ -1095,6 +1097,7 @@ var PACMAN = (function() {
         if (state !== WAITING && state !== PAUSE) {
             e.preventDefault();
             e.stopPropagation();
+            sendMessage("test");
         }
     };
 
@@ -1658,3 +1661,28 @@ Object.prototype.clone = function() {
     }
     return newObj;
 };
+
+function sendMessage(path, opt_param) {
+    path += '?gamekey=' + state.game_key;
+    if (opt_param) {
+        path += '&' + opt_param;
+    }
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', path, true);
+    xhr.send();
+};
+
+function sendMessage(id) {
+    if (isMyMove() && state.board[id] == ' ') {
+        sendMessage('/move', 'i=' + id);
+    }
+}
+
+//isMyMove = function() {
+//    return (state.winner == "") &&
+//        (state.moveX == (state.userX == state.me));
+//}
+//
+//myPiece = function() {
+//    return state.userX == state.me ? 'X' : 'O';
+//}

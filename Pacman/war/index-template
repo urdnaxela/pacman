@@ -61,15 +61,6 @@
             }
         };
 
-        isMyMove = function() {
-            return (state.winner == "") &&
-                (state.moveX == (state.userX == state.me));
-        }
-
-        myPiece = function() {
-            return state.userX == state.me ? 'X' : 'O';
-        }
-
         sendMessage = function(path, opt_param) {
             path += '?gamekey=' + state.game_key;
             if (opt_param) {
@@ -79,12 +70,6 @@
             xhr.open('POST', path, true);
             xhr.send();
         };
-
-        moveInSquare = function(id) {
-            if (isMyMove() && state.board[id] == ' ') {
-                sendMessage('/move', 'i=' + id);
-            }
-        }
 
         onOpened = function() {
             sendMessage('/opened');
