@@ -16,13 +16,14 @@ public class MoveServlet extends HttpServlet {
   public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     UserService userService = UserServiceFactory.getUserService();
     String gameId = req.getParameter("gamekey");
-    String piece = req.getParameter("i"); 
+    String piece = req.getParameter("i");  
+    int x = 0, y = 0;
     
     PersistenceManager pm = PMF.get().getPersistenceManager();
     Game game = pm.getObjectById(Game.class, KeyFactory.stringToKey(gameId));
     
     String currentUserId = userService.getCurrentUser().getUserId();
-    if (!game.makeMove(piece, currentUserId)) {
+    if (!game.makeMove(piece, x, y, currentUserId)) {
       resp.setStatus(401);
     }
     pm.close();

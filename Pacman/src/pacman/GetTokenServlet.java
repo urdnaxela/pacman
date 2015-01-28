@@ -24,8 +24,8 @@ public class GetTokenServlet extends HttpServlet {
     Game game = pm.getObjectById(Game.class, KeyFactory.stringToKey(gameId));
     
     String currentUserId = userService.getCurrentUser().getUserId();
-    if (currentUserId.equals(game.getUserX()) ||
-        currentUserId.equals(game.getUserO())) {
+    if (currentUserId.equals(game.getPacman()) ||
+        currentUserId.equals(game.getPhantom())) {
       String channelKey = game.getChannelKey(currentUserId);
       ChannelService channelService = ChannelServiceFactory.getChannelService();
       resp.setContentType("text/plain");

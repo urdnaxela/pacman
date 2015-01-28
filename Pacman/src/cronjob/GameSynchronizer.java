@@ -8,11 +8,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import pacman.Game;
 import pacman.PMF;
 
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 
 public class GameSynchronizer extends HttpServlet {
 	/**
@@ -47,6 +51,22 @@ public class GameSynchronizer extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
+		_logger.info("Processing: " + req.getHeader("X-AppEngine-TaskName")
+				+ "-" + TASK_COUNTER++);
+		queueObjectsNeedingProcessing();
+		UserService userService = UserServiceFactory.getUserService();
+	    String gameId = req.getParameter("gamekey");
+	    String piece = req.getParameter("i");  
+	    int x = 0, y = 0;
+	    
+	    PersistenceManager pm = PMF.get().getPersistenceManager();
+	    Game game = pm.getObjectById(Game.class, KeyFactory.stringToKey(gameId));
+	    
+	    String currentUserId = userService.getCurrentUser().getUserId();
+	    if (!game.makeMove(piece, x, y, currentUserId)) {
+	      resp.setStatus(401);
+	    }
+	    pm.close();
 	}
 
 	static public int queueObjectsNeedingProcessing() {
@@ -57,7 +77,7 @@ public class GameSynchronizer extends HttpServlet {
 			pm.currentTransaction().begin();
 
 			TaskOptions taskOptions = TaskOptions.Builder.withUrl(
-					"/GameSynchronizer").method(TaskOptions.Method.GET);
+					"/GameSynchronizer").method(TaskOptions.Method.POST);
 			queue.add(taskOptions);
 			pm.currentTransaction().commit();
 			return count;

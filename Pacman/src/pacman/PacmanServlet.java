@@ -65,8 +65,8 @@ public class PacmanServlet extends HttpServlet {
     String userId = userService.getCurrentUser().getUserId();
     if (gameKey != null) {
       game = pm.getObjectById(Game.class, KeyFactory.stringToKey(gameKey));
-      if (game.getUserO() == null && !userId.equals(game.getUserX())) {
-        game.setUserO(userId);
+      if (game.getPhantom() == null && !userId.equals(game.getPacman())) {
+        game.setPhantom(userId);
         
         //add synchronize
         GameSynchronizer.queueObjectsNeedingProcessing();       
