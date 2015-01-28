@@ -22,8 +22,9 @@ var NONE = 4,
     GDOWN       = 83,
     GRIGHT      = 68,
     Pacman = {};
-var globalState = 5;
 
+var globalState = 5;
+var gameStarted = false;
 Pacman.FPS = 30;
 
 Pacman.Ghost = function(game, map, colour) {
@@ -1063,12 +1064,7 @@ var PACMAN = (function() {
             display['you-won'] = 'block';
         } else if (globalState.winner != '') {
             display['you-lost'] = 'block';
-        } else if (isMyMove()) {
-            display['your-move'] = 'block';
-        } else {
-            display['their-move'] = 'block';
-        }
-
+        } 
         $.each(display, function(index, value) {
             $("#" + index).css("display", value);
         });
@@ -1100,6 +1096,7 @@ var PACMAN = (function() {
         }
     };
 
+   
     function init(root, state) {
         globalState = state;
         var i, len, ghost,  canvas, blockSize;
@@ -1159,6 +1156,19 @@ var PACMAN = (function() {
         });
     };
 
+    function update(state) {
+    	globalState = state;
+    	
+        if (globalState.gameState === "START" && !gameStarted) {
+        	startNewGame();
+        	gameStarted = true;
+        }else if(globalState.gameState === "STOP"){
+        	gameStarted = false;
+        } else if(gameStarted){
+        	
+        }
+    };
+    
     function load(arr, callback) {
 
         if (arr.length === 0) {
@@ -1177,9 +1187,10 @@ var PACMAN = (function() {
         document.addEventListener("keypress", keyPress, true);
         timer = window.setInterval(mainLoop, 1000 / Pacman.FPS);
     };
-
+    
     return {
-        "init": init
+        "init": init,
+        "update": update,
     };
 
 }());
@@ -1664,12 +1675,17 @@ Object.prototype.clone = function() {
 function callServlet(id) {
     sendMessage('/move', 'i=' + id);
 }
+//function update(state) {
+//	globalState = state;
+//	
+//    if (globalState.gameState === "START" && !gameStarted) {
+//    	PACMAN.startNewGame();
+//    	startNewGame();
+//    	gameStarted = true;
+//    }else if(globalState.gameState === "STOP"){
+//    	gameStarted = false;
+//    } else if(gameStarted){
+//    	
+//    }
+//}
 
-//isMyMove = function() {
-//    return (state.winner == "") &&
-//        (state.moveX == (state.userX == state.me));
-//}
-//
-//myPiece = function() {
-//    return state.userX == state.me ? 'X' : 'O';
-//}

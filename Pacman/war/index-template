@@ -54,13 +54,12 @@
         	debugger;
             
             if (currentState.gameState === "START") {
-            	PACMAN.startNewGame();
+            	PACMAN.update(currentState);
             }
-            
-            //init pac-man
-            if (Modernizr.canvas && Modernizr.localstorage &&
+            else if (Modernizr.canvas && Modernizr.localstorage &&
                 Modernizr.audio && (Modernizr.audio.ogg || Modernizr.audio.mp3)) {
                 PACMAN.init("./", currentState);
+                
             } else {
                 el.innerHTML = "Sorry, needs a decent browser<br /><small>" +
                     "(firefox 3.6+, Chrome 4+, Opera 10+ and Safari 4+)</small>";
