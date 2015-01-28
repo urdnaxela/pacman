@@ -83,9 +83,9 @@
         onMessage = function(m) {
             newState = JSON.parse(m.data);
             state.board = newState.board || state.board;
-            state.userX = newState.userX || state.userX;
-            state.userO = newState.userO || state.userO;
-            state.moveX = newState.moveX == 'true';
+            state.pacman = newState.pacman || state.pacman;
+            state.ghost = newState.ghost || state.ghost;
+            state.pacmanDirection = newState.pacmanDirection;
             state.winner = newState.winner || "";
             state.winningBoard = newState.winningBoard || "";
             state.gameState = newState.gameState || "";

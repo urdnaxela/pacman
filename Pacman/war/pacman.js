@@ -370,6 +370,7 @@ Pacman.User = function(game, map) {
             due = keyMap[e.keyCode];
             e.preventDefault();
             e.stopPropagation();
+        	movePack(due);
             return false;
         }
         return true;
@@ -1056,7 +1057,7 @@ var PACMAN = (function() {
             'this-game': 'block',
         };
 
-        if (!globalState.userO || globalState.userO == null) {
+        if (!globalState.ghost || globalState.ghost == null) {
             display['other-player'] = 'block';
             display['board'] = 'none';
             display['this-game'] = 'none';
@@ -1164,8 +1165,9 @@ var PACMAN = (function() {
         	gameStarted = true;
         }else if(globalState.gameState === "STOP"){
         	gameStarted = false;
-        } else if(gameStarted){
-        	
+        } else if(globalState.pacmanDirection != "undefined"){
+        	user.due = globalState.pacmanDirection;
+        	user.move(ctx);
         }
     };
     
@@ -1673,7 +1675,11 @@ Object.prototype.clone = function() {
 };
 
 function callServlet(id) {
-    sendMessage('/move', 'i=' + id);
+    sendMessage('/move', 'state=' + id);
+}
+
+function movePack(id) {
+    sendMessage('/move', 'direction=' + id);
 }
 //function update(state) {
 //	globalState = state;

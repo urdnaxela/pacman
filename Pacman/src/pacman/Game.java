@@ -29,13 +29,10 @@ public class Game {
   private String pacman = null;
   
   @Persistent
-  private int pacmanX;
+  private String pacmanDirection;
 
   @Persistent
-  private int pacmanY;
-
-  @Persistent
-  private String phantom = null;
+  private String ghost = null;
 
   @Persistent
   private String board = null;
@@ -54,7 +51,7 @@ public class Game {
 
   Game(String userX, String userO, String board, boolean moveX) {
     this.pacman = userX;
-    this.phantom = userO;
+    this.ghost = userO;
     this.board = board;
     this.pacmanMove = moveX;
   }
@@ -68,11 +65,11 @@ public class Game {
   }
 
   public String getPhantom() {
-    return phantom;
+    return ghost;
   }
 
   public void setPhantom(String phantom) {
-    this.phantom = phantom;
+    this.ghost = phantom;
   }
 
   public String getBoard() {
@@ -88,19 +85,22 @@ public class Game {
   }
 
   public void setGameState(String gameState) {
-	  this.gameState = gameState;
+	  if ( !gameState.equals(this.gameState)){
+		  this.gameState = gameState;
+		  sendUpdateToClients();
+	  }
   }
 
   public String getMessageString() {
     Map<String, String> state = new HashMap<String, String>();
-    state.put("userX", pacman);
-    if (phantom == null) {
-      state.put("userO", null);
+    state.put("pacman", pacman);
+    if (ghost == null) {
+      state.put("ghost", null);
     } else {
-      state.put("userO", phantom);
+      state.put("ghost", ghost);
     }
     state.put("board", board);
-    state.put("moveX", pacmanMove.toString());
+    state.put("pacmanDirection", pacmanMove.toString());
     state.put("winner", winner);
     if (winner != null && winner != "") {
       state.put("winningBoard", winningBoard);
@@ -126,30 +126,22 @@ public class Game {
 
   public void sendUpdateToClients() {
     sendUpdateToUser(pacman);
-    sendUpdateToUser(phantom);
+    sendUpdateToUser(ghost);
   }
 
   public void checkWin() {
     
   }
 
-  public boolean makeMove(String gameState, int x, int y, String user) {
+  public boolean makeMove(String direction, String user) {
     String currentMovePlayer;
     char value;
     if (user.equals(pacman)) {
-      pacmanX = x;
-      pacmanY = y;
+      pacmanDirection = direction; 
     } else {
       // update phantom
     }
-
-    
-    if ("START".equals(gameState)) {
-    	this.gameState = gameState;
-    	sendUpdateToClients();
-    	return true;	
-	}
-    
-    return false;
+    sendUpdateToClients();
+    return true;
   }
 }
