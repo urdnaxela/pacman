@@ -144,7 +144,8 @@ public class Game {
     }
 
     
-    if ("START".equals(this.gameState)) {
+    if ("START".equals(gameState)) {
+    	this.gameState = gameState;
     	sendUpdateToClients();
     	return true;	
 	}
