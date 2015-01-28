@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import pacman.Game;
 import pacman.PMF;
+import pacman.PacmanServlet;
 
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.taskqueue.Queue;
@@ -31,19 +32,19 @@ public class GameSynchronizer extends HttpServlet {
 	public void doGet(HttpServletRequest req, HttpServletResponse response)
 			throws IOException {
 
-		// This is the body of the task
-		_logger.info("Processing: " + req.getHeader("X-AppEngine-TaskName")
-				+ "-" + TASK_COUNTER++);
-		queueObjectsNeedingProcessing();
-		try {
-
-			// Sleep for a second (if the rate is set to 1/s this will allow
-			// at most 1 more task to be processed)
-			Thread.sleep(1000);
-
-		} catch (InterruptedException e) { // ignore}
-
-		}
+//		// This is the body of the task
+//		_logger.info("Processing: " + req.getHeader("X-AppEngine-TaskName")
+//				+ "-" + TASK_COUNTER++);
+//		queueObjectsNeedingProcessing();
+//		try {
+//
+//			// Sleep for a second (if the rate is set to 1/s this will allow
+//			// at most 1 more task to be processed)
+//			Thread.sleep(1000);
+//
+//		} catch (InterruptedException e) { // ignore}
+//
+//		}
 
 	}
 
@@ -51,22 +52,22 @@ public class GameSynchronizer extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		_logger.info("Processing: " + req.getHeader("X-AppEngine-TaskName")
-				+ "-" + TASK_COUNTER++);
-		queueObjectsNeedingProcessing();
-		UserService userService = UserServiceFactory.getUserService();
-	    String gameId = req.getParameter("gamekey");
-	    String piece = req.getParameter("i");  
-	    int x = 0, y = 0;
-	    
-	    PersistenceManager pm = PMF.get().getPersistenceManager();
-	    Game game = pm.getObjectById(Game.class, KeyFactory.stringToKey(gameId));
-	    
-	    String currentUserId = userService.getCurrentUser().getUserId();
-	    if (!game.makeMove(piece, x, y, currentUserId)) {
-	      resp.setStatus(401);
-	    }
-	    pm.close();
+//		_logger.info("Processing: " + req.getHeader("X-AppEngine-TaskName")
+//				+ "-" + TASK_COUNTER++);
+//		queueObjectsNeedingProcessing();
+//		UserService userService = UserServiceFactory.getUserService();
+//	    String gameId = PacmanServlet.gameKey;
+//	    String piece = "";//req.getParameter("i");  
+//	    int x = 0, y = 0;
+//	    
+//	    PersistenceManager pm = PMF.get().getPersistenceManager();
+//	    Game game = pm.getObjectById(Game.class, KeyFactory.stringToKey(gameId));
+//	    
+//	    String currentUserId = userService.getCurrentUser().getUserId();
+//	    if (!game.makeMove(piece, x, y, currentUserId)) {
+//	      resp.setStatus(401);
+//	    }
+//	    pm.close();
 	}
 
 	static public int queueObjectsNeedingProcessing() {

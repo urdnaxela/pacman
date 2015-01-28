@@ -22,6 +22,7 @@ import javax.servlet.http.*;
 
 @SuppressWarnings("serial")
 public class PacmanServlet extends HttpServlet {
+	public static String gameKey;
   private String getGameUriWithGameParam(HttpServletRequest req,
       String gameKey) throws IOException {    
     try {
@@ -51,6 +52,7 @@ public class PacmanServlet extends HttpServlet {
     final UserService userService = UserServiceFactory.getUserService();
     final URI uriWithOptionalGameParam; 
     String gameKey = req.getParameter("g");
+    this.gameKey = gameKey;
     if (userService.getCurrentUser() == null) {
       String thisURL = req.getRequestURL().toString();      
       resp.getWriter().println("<p>Please <a href=\"" +
